@@ -406,6 +406,28 @@ with tab1:
         col_r4, col_r5 = st.columns(2)
         col_r4.metric("Utilidad esperada", f"${utilidad:,.0f}")
         col_r5.metric("Margen estimado", f"{margen_porcentaje:,.1f} %")
+        # ============================================
+# DECISIÓN AUTOMÁTICA DE COMPRA
+# ============================================
+st.subheader("🚦 Decisión de compra")
+
+if margen_porcentaje >= 20:
+    decision = "COMPRAR"
+    st.success("🟢 RECOMENDACIÓN: COMPRAR")
+    st.write("La operación presenta un margen atractivo y cumple con el objetivo de rentabilidad.")
+
+elif margen_porcentaje >= 10:
+    decision = "NEGOCIAR"
+    st.warning("🟡 RECOMENDACIÓN: NEGOCIAR")
+    st.write("El margen es aceptable, pero se recomienda negociar mejor el precio de compra o reducir costos.")
+
+else:
+    decision = "NO COMPRAR"
+    st.error("🔴 RECOMENDACIÓN: NO COMPRAR")
+    st.write("El margen es bajo y existe riesgo de pérdida en la operación.")
+        # DECISIÓN EJECUTIVA
+
+st.write(mensaje_decision)
 
         with st.expander("Ver detalle de costos"):
             st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
@@ -544,6 +566,19 @@ with tab3:
             "Comparar TRAIN vs TEST permite verificar que el modelo no esté sobreajustado. "
             "En este caso, las métricas son razonablemente cercanas, lo que indica buena generalización."
         )
+        st.subheader("📌 Interpretación ejecutiva")
+
+st.markdown(
+    """
+    El modelo permite estimar el precio de mercado de un camión en buen estado
+    y usar esa estimación como base para calcular el precio máximo recomendable
+    de compra de una unidad siniestrada.
+
+    Desde el punto de vista de negocio, el resultado no debe interpretarse como
+    un precio exacto, sino como una referencia para negociar y reducir el riesgo
+    de sobrepago.
+    """
+)
 
 # ============================================
 # TAB 4 - ASISTENTE IA (ChatGPT)

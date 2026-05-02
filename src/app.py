@@ -428,7 +428,6 @@ else:
         # DECISIÓN EJECUTIVA
 
 st.write(mensaje_decision)
-
         with st.expander("Ver detalle de costos"):
             st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
             st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:,.0f} MXN")

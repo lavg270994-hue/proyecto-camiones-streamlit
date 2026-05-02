@@ -406,24 +406,24 @@ with tab1:
         col_r4, col_r5 = st.columns(2)
         col_r4.metric("Utilidad esperada", f"${utilidad:,.0f}")
         col_r5.metric("Margen estimado", f"{margen_porcentaje:,.1f} %")
-        # ============================================
-# ============================================
-# DECISIÓN AUTOMÁTICA DE COMPRA
-# ============================================
-st.subheader("🚦 Decisión de compra")
+        col_r5.metric("Margen estimado", f"{margen_porcentaje:,.1f} %")
+            # ============================================
+    # DECISIÓN AUTOMÁTICA DE COMPRA
+    # ============================================
+    st.subheader("🚦 Decisión de compra")
 
-if margen_porcentaje >= 20:
-    st.success("🟢 RECOMENDACIÓN: COMPRAR")
-    st.write("La operación presenta un margen atractivo y cumple con el objetivo de rentabilidad.")
+    if margen_porcentaje >= 20:
+        st.success("🟢 RECOMENDACIÓN: COMPRAR")
+        st.write("La operación presenta un margen atractivo y cumple con el objetivo de rentabilidad.")
 
-elif margen_porcentaje >= 10:
-    st.warning("🟡 RECOMENDACIÓN: NEGOCIAR")
-    st.write("El margen es aceptable, pero se recomienda negociar mejor el precio de compra o reducir costos.")
+    elif margen_porcentaje >= 10:
+        st.warning("🟡 RECOMENDACIÓN: NEGOCIAR")
+        st.write("El margen es aceptable, pero se recomienda negociar mejor el precio de compra o reducir costos.")
 
-else:
-    st.error("🔴 RECOMENDACIÓN: NO COMPRAR")
-    st.write("El margen es bajo y existe riesgo de pérdida en la operación.")
-
+    else:
+        st.error("🔴 RECOMENDACIÓN: NO COMPRAR")
+        st.write("El margen es bajo y existe riesgo de pérdida en la operación.")
+   
 
 # ============================================
 # DETALLE DE COSTOS

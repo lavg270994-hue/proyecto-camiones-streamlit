@@ -402,7 +402,6 @@ with tab1:
         col_r1.metric("Precio mercado ajustado", f"${precio_modelo_ajustado:,.0f}")
         col_r2.metric("Precio sugerido de compra", f"${precio_compra_siniestro:,.0f}")
         col_r3.metric("Precio sugerido de venta", f"${precio_venta_sugerido:,.0f}")
-
         col_r4, col_r5 = st.columns(2)
         col_r4.metric("Utilidad esperada", f"${utilidad:,.0f}")
         col_r5.metric("Margen estimado", f"{margen_porcentaje:,.1f} %")

@@ -427,13 +427,13 @@ with tab1:
 # DETALLE DE COSTOS
 # ============================================
 with st.expander("Ver detalle de costos"):
-    st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
-    st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:,.0f} MXN")
+    st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:.0f} MXN")
+    st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:.0f} MXN")
     st.write("----")
-    st.write(f"🚚 Logística: ${costo_logistica:,.0f} MXN")
-    st.write(f"🔧 Reparación: ${costo_reparacion:,.0f} MXN")
-    st.write(f"📦 Otros costos: ${otros_costos:,.0f} MXN")
-    st.write(f"🧾 **Costo total:** ${costo_total:,.0f} MXN")
+    st.write(f"🚚 Logística: ${costo_logistica:.0f} MXN")
+    st.write(f"🔧 Reparación: ${costo_reparacion:.0f} MXN")
+    st.write(f"📦 Otros costos: ${otros_costos:.0f} MXN")
+    st.write(f"🧾 **Costo total:** ${costo_total:.0f} MXN")
 
 
 st.success(

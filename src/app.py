@@ -407,40 +407,41 @@ with tab1:
         col_r4.metric("Utilidad esperada", f"${utilidad:,.0f}")
         col_r5.metric("Margen estimado", f"{margen_porcentaje:,.1f} %")
         # ============================================
+# ============================================
 # DECISIÓN AUTOMÁTICA DE COMPRA
 # ============================================
 st.subheader("🚦 Decisión de compra")
 
 if margen_porcentaje >= 20:
-    decision = "COMPRAR"
     st.success("🟢 RECOMENDACIÓN: COMPRAR")
     st.write("La operación presenta un margen atractivo y cumple con el objetivo de rentabilidad.")
 
 elif margen_porcentaje >= 10:
-    decision = "NEGOCIAR"
     st.warning("🟡 RECOMENDACIÓN: NEGOCIAR")
     st.write("El margen es aceptable, pero se recomienda negociar mejor el precio de compra o reducir costos.")
 
 else:
-    decision = "NO COMPRAR"
     st.error("🔴 RECOMENDACIÓN: NO COMPRAR")
     st.write("El margen es bajo y existe riesgo de pérdida en la operación.")
-        # DECISIÓN EJECUTIVA
 
-st.write(mensaje_decision)
+
+# ============================================
+# DETALLE DE COSTOS
+# ============================================
 with st.expander("Ver detalle de costos"):
-            st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
-            st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:,.0f} MXN")
-            st.write("----")
-            st.write(f"🚚 Logística: ${costo_logistica:,.0f} MXN")
-            st.write(f"🔧 Reparación: ${costo_reparacion:,.0f} MXN")
-            st.write(f"📦 Otros costos: ${otros_costos:,.0f} MXN")
-            st.write(f"🧾 **Costo total:** ${costo_total:,.0f} MXN")
+    st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
+    st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:,.0f} MXN")
+    st.write("----")
+    st.write(f"🚚 Logística: ${costo_logistica:,.0f} MXN")
+    st.write(f"🔧 Reparación: ${costo_reparacion:,.0f} MXN")
+    st.write(f"📦 Otros costos: ${otros_costos:,.0f} MXN")
+    st.write(f"🧾 **Costo total:** ${costo_total:,.0f} MXN")
 
-        st.success(
-            "✅ Cotización generada. Usa estos valores como referencia para "
-            "negociar la compra del siniestro y definir tu precio objetivo de venta."
-        )
+
+st.success(
+    "✅ Cotización generada. Usa estos valores como referencia para "
+    "negociar la compra del siniestro y definir tu precio objetivo de venta."
+)
 
 # ============================================
 # TAB 2 - DASHBOARD

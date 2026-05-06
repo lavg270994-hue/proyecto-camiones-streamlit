@@ -25,7 +25,6 @@ def cargar_dataset():
     return pd.read_csv("data/raw/dataset_camiones_mexico.csv")
 
 
-@st.cache_data
 def cargar_metricas_guardadas():
     metrics_path = Path("model_metrics.json")
     if not metrics_path.exists():

@@ -1,23 +1,20 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import numpy as np
-import os
-from openai import OpenAI
 import json
 from pathlib import Path
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import altair as alt
 
+
+# ================== CONFIGURACIÓN ==================
 st.set_page_config(
     page_title="Cotizador de camiones siniestrados",
     page_icon="🚛",
     layout="wide"
 )
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-
+# ================== CARGA DE ARCHIVOS ==================
 @st.cache_resource
 def cargar_modelo():
     return joblib.load("model_camiones.pkl")
@@ -39,27 +36,19 @@ def cargar_metricas_guardadas():
 
 model = cargar_modelo()
 df = cargar_dataset()
-
-FEATURE_COLS = [
-    "truck_brand",
-    "truck_model",
-    "truck_year",
-    "engine_model",
-    "transmission",
-    "axle_type",
-    "ubication"
-]
+metrics = cargar_metricas_guardadas()
 
 TARGET_COL = "market_price_mex"
 
 
+# ================== HOME ==================
 st.markdown(
     """
     <h1 style='text-align: center; margin-bottom: 0'>
         🚛 Cotizador inteligente de camiones siniestrados
     </h1>
     <p style='text-align: center; color: gray; margin-top: 4px;'>
-        Proyecto final · Machine Learning · Valuación de tractocamiones en el mercado Mexicano
+        Proyecto final · Machine Learning · Toma de decisiones en compra de tractocamiones
     </p>
     """,
     unsafe_allow_html=True,
@@ -72,29 +61,25 @@ with home_col1:
         """
         ### 🧩 ¿Qué problema resuelve?
 
-        En la compra–venta de camiones siniestrados es fácil:
-        - Pagar **de más** por una unidad dañada.
-        - Subestimar **costos de reparación y logística**.
-        - Fijar un precio de venta **poco competitivo**.
+        En la compra de camiones siniestrados existe incertidumbre sobre el precio máximo
+        que conviene pagar. Un error en la valuación puede generar pérdidas por sobrepago,
+        costos mal estimados o márgenes insuficientes.
 
-        Esta herramienta usa Machine Learning para estimar el **precio de mercado**
-        de un camión en buen estado y apoyar la decisión de compra.
+        Esta aplicación usa Machine Learning para estimar el precio de mercado de un camión
+        en buen estado y traducir ese resultado en una recomendación de negocio.
         """
     )
 
 with home_col2:
     st.markdown("### 📊 KPIs del dataset")
-    n_registros = len(df)
-    precio_prom = df[TARGET_COL].mean()
-    precio_mediana = df[TARGET_COL].median()
-    anio_min = int(df["truck_year"].min())
-    anio_max = int(df["truck_year"].max())
-    n_marcas = df["truck_brand"].nunique()
 
-    st.metric("Total de registros", f"{n_registros:,}")
-    st.metric("Precio promedio", f"${precio_prom:,.0f} MXN")
-    st.metric("Precio mediano", f"${precio_mediana:,.0f} MXN")
-    st.caption(f"Rango de años: {anio_min} - {anio_max} · Marcas: {n_marcas}")
+    st.metric("Total de registros", f"{len(df):,}")
+    st.metric("Precio promedio", f"${df[TARGET_COL].mean():,.0f} MXN")
+    st.metric("Precio mediano", f"${df[TARGET_COL].median():,.0f} MXN")
+    st.caption(
+        f"Rango de años: {int(df['truck_year'].min())} - {int(df['truck_year'].max())} · "
+        f"Marcas: {df['truck_brand'].nunique()}"
+    )
 
 st.markdown("---")
 
@@ -103,7 +88,7 @@ st.markdown(
     ### 🧭 ¿Cómo usar la aplicación?
 
     1. Ingresa los datos del camión.
-    2. Ajusta descuento, costos y markup.
+    2. Ajusta descuento, costos y margen deseado.
     3. Calcula la cotización.
     4. Revisa la recomendación automática: **comprar, negociar o no comprar**.
     """
@@ -112,14 +97,15 @@ st.markdown(
 st.markdown("---")
 
 
-tab1, tab2, tab3, tab4 = st.tabs([
+# ================== TABS ==================
+tab1, tab2, tab3 = st.tabs([
     "🧮 Cotizador",
     "📊 Dashboard de mercado",
-    "📈 Modelo y métricas",
-    "🤖 Asistente IA"
+    "📈 Modelo y métricas"
 ])
 
 
+# ================== TAB 1: COTIZADOR ==================
 with tab1:
     st.header("1️⃣ Datos del camión accidentado")
 
@@ -150,27 +136,31 @@ with tab1:
     with col3:
         descuento_compra = st.slider(
             "Descuento para compra (%)",
-            12, 40, 35,
-            help="Descuento respecto al valor de mercado del camión en buen estado."
+            12,
+            40,
+            35,
+            help="Descuento aplicado al valor estimado de mercado."
         )
 
     with col4:
         markup_venta = st.slider(
             "Markup de venta (%)",
-            5, 50, 25,
+            5,
+            50,
+            25,
             help="Porcentaje de utilidad deseada sobre el costo total."
         )
 
     col5, col6, col7 = st.columns(3)
 
     with col5:
-        costo_logistica = st.number_input("Logística [MXN]", 0, step=1000)
+        costo_logistica = st.number_input("Logística [MXN]", min_value=0, step=1000)
 
     with col6:
-        costo_reparacion = st.number_input("Reparación [MXN]", 0, step=1000)
+        costo_reparacion = st.number_input("Reparación [MXN]", min_value=0, step=1000)
 
     with col7:
-        otros_costos = st.number_input("Otros costos [MXN]", 0, step=1000)
+        otros_costos = st.number_input("Otros costos [MXN]", min_value=0, step=1000)
 
     st.markdown("---")
 
@@ -194,6 +184,7 @@ with tab1:
         trans_str = trans.lower()
         axle_str = str(axle).lower()
 
+        # Ajuste por motor
         factor_motor = 1.0
         extra_motor = 0
 
@@ -214,6 +205,7 @@ with tab1:
         elif "mack" in engine_str:
             factor_motor, extra_motor = 0.90, -80000
 
+        # Ajuste por transmisión
         factor_trans = 1.0
         extra_trans = 0
 
@@ -228,6 +220,7 @@ with tab1:
         elif "allison" in trans_str:
             factor_trans, extra_trans = 0.95, -20000
 
+        # Ajuste por eje
         factor_eje = 1.0
         extra_eje = 0
 
@@ -253,11 +246,10 @@ with tab1:
         )
 
         precio_venta_sugerido = costo_total * (1 + markup_venta / 100)
-
         utilidad = precio_venta_sugerido - costo_total
 
         margen_porcentaje = (
-            (utilidad / precio_venta_sugerido * 100)
+            utilidad / precio_venta_sugerido * 100
             if precio_venta_sugerido > 0
             else 0
         )
@@ -293,8 +285,8 @@ with tab1:
         )
 
         with st.expander("Ver detalle de costos"):
-            st.write(f"💸 **Precio de mercado ajustado (camión bueno):** ${precio_modelo_ajustado:,.0f} MXN")
-            st.write(f"🟢 **Precio sugerido de COMPRA:** ${precio_compra_siniestro:,.0f} MXN")
+            st.write(f"💸 **Precio de mercado ajustado:** ${precio_modelo_ajustado:,.0f} MXN")
+            st.write(f"🟢 **Precio sugerido de compra:** ${precio_compra_siniestro:,.0f} MXN")
             st.write("----")
             st.write(f"🚚 Logística: ${costo_logistica:,.0f} MXN")
             st.write(f"🔧 Reparación: ${costo_reparacion:,.0f} MXN")
@@ -302,11 +294,11 @@ with tab1:
             st.write(f"🧾 **Costo total:** ${costo_total:,.0f} MXN")
 
         st.success(
-            "✅ Cotización generada. Usa estos valores como referencia para "
-            "negociar la compra del siniestro y definir tu precio objetivo de venta."
+            "✅ Cotización generada. Usa estos valores como referencia para negociar la compra."
         )
 
 
+# ================== TAB 2: DASHBOARD ==================
 with tab2:
     st.header("📊 Dashboard de mercado")
 
@@ -353,7 +345,11 @@ with tab2:
     st.subheader("1️⃣ Distribución de precios de mercado")
 
     chart_hist = alt.Chart(df_filtrado).mark_bar().encode(
-        x=alt.X("market_price_mex:Q", bin=alt.Bin(maxbins=30), title="Precio de mercado [MXN]"),
+        x=alt.X(
+            "market_price_mex:Q",
+            bin=alt.Bin(maxbins=30),
+            title="Precio de mercado [MXN]"
+        ),
         y=alt.Y("count():Q", title="Número de camiones"),
         tooltip=["count()"]
     ).properties(height=300)
@@ -393,22 +389,100 @@ with tab2:
     st.altair_chart(chart_year, use_container_width=True)
 
 
+# ================== TAB 3: MODELO Y MÉTRICAS ==================
 with tab3:
     st.header("📈 Modelo y métricas")
 
     st.markdown(
         """
-        En esta sección se muestran las métricas del modelo de regresión entrenado
-        y evaluado con una partición **train/test**.
+        En esta sección se muestra la comparación entre los modelos evaluados y
+        las métricas del modelo final seleccionado.
         """
     )
-
-    metrics = cargar_metricas_guardadas()
 
     if metrics is None:
         st.error("No se encontraron métricas guardadas. Ejecuta primero `python src/train_model.py`.")
 
     else:
+        st.subheader("🏆 Mejor modelo seleccionado")
+
+        best_model = metrics.get("best_model", "No especificado")
+        criterion = metrics.get("selection_criterion", "Menor error en prueba")
+
+        colb1, colb2 = st.columns(2)
+        colb1.metric("Modelo final", best_model)
+        colb2.metric("Criterio de selección", criterion)
+
+        st.markdown("---")
+
+        st.subheader("🔍 Comparación de modelos")
+
+        if "models" in metrics:
+            comparison_rows = []
+
+            for model_name, values in metrics["models"].items():
+                test_metrics = values["test"]
+                train_metrics = values["train"]
+
+                comparison_rows.append({
+                    "Modelo": model_name,
+                    "MAE Test": test_metrics["mae"],
+                    "RMSE Test": test_metrics["rmse"],
+                    "R² Test": test_metrics["r2"],
+                    "MAE Train": train_metrics["mae"],
+                    "RMSE Train": train_metrics["rmse"],
+                    "R² Train": train_metrics["r2"],
+                })
+
+            df_comparison = pd.DataFrame(comparison_rows)
+
+            st.dataframe(
+                df_comparison.style.format({
+                    "MAE Test": "${:,.0f}",
+                    "RMSE Test": "${:,.0f}",
+                    "R² Test": "{:.3f}",
+                    "MAE Train": "${:,.0f}",
+                    "RMSE Train": "${:,.0f}",
+                    "R² Train": "{:.3f}",
+                }),
+                use_container_width=True
+            )
+
+            st.markdown(
+                """
+                **Interpretación:**  
+                La comparación permite identificar qué algoritmo predice mejor el precio de mercado.
+                Se selecciona el modelo con menor RMSE en el conjunto de prueba, ya que esta métrica
+                penaliza con mayor fuerza los errores grandes.
+                """
+            )
+
+            df_chart = df_comparison.melt(
+                id_vars="Modelo",
+                value_vars=["MAE Test", "RMSE Test"],
+                var_name="Métrica",
+                value_name="Valor"
+            )
+
+            chart_models = alt.Chart(df_chart).mark_bar().encode(
+                x=alt.X("Modelo:N", title="Modelo"),
+                y=alt.Y("Valor:Q", title="Error [MXN]"),
+                color="Métrica:N",
+                tooltip=["Modelo", "Métrica", "Valor"]
+            ).properties(height=350)
+
+            st.altair_chart(chart_models, use_container_width=True)
+
+        else:
+            st.warning(
+                "El archivo de métricas todavía no contiene comparación de modelos. "
+                "Ejecuta nuevamente `python src/train_model.py`."
+            )
+
+        st.markdown("---")
+
+        st.subheader("🔢 Métricas del modelo final")
+
         mae_test = metrics["test"]["mae"]
         rmse_test = metrics["test"]["rmse"]
         r2_test = metrics["test"]["r2"]
@@ -417,84 +491,38 @@ with tab3:
         rmse_train = metrics["train"]["rmse"]
         r2_train = metrics["train"]["r2"]
 
-        st.subheader("🔢 Métricas en conjunto de prueba (TEST)")
-
         colm1, colm2, colm3 = st.columns(3)
-        colm1.metric("MAE (test)", f"${mae_test:,.0f}")
-        colm2.metric("RMSE (test)", f"${rmse_test:,.0f}")
-        colm3.metric("R² (test)", f"{r2_test:.3f}")
+        colm1.metric("MAE Test", f"${mae_test:,.0f}")
+        colm2.metric("RMSE Test", f"${rmse_test:,.0f}")
+        colm3.metric("R² Test", f"{r2_test:.3f}")
 
-        st.caption("Estas métricas se calcularon sobre datos reservados para prueba.")
-
-        st.subheader("📚 Métricas en entrenamiento (TRAIN)")
+        st.subheader("📚 Comparación Train vs Test")
 
         colt1, colt2, colt3 = st.columns(3)
-        colt1.metric("MAE (train)", f"${mae_train:,.0f}")
-        colt2.metric("RMSE (train)", f"${rmse_train:,.0f}")
-        colt3.metric("R² (train)", f"{r2_train:.3f}")
+        colt1.metric("MAE Train", f"${mae_train:,.0f}")
+        colt2.metric("RMSE Train", f"${rmse_train:,.0f}")
+        colt3.metric("R² Train", f"{r2_train:.3f}")
 
         st.caption(
-            "Comparar TRAIN vs TEST permite verificar que el modelo no esté sobreajustado."
+            "Comparar entrenamiento contra prueba permite revisar si existe sobreajuste o bajo ajuste."
         )
 
         st.subheader("📌 Interpretación ejecutiva")
 
         st.markdown(
             """
-            El modelo permite estimar el precio de mercado de un camión en buen estado
-            y usar esa estimación como base para calcular el precio máximo recomendable
-            de compra de una unidad siniestrada.
+            El modelo final permite estimar el precio de mercado de un camión en buen estado
+            y usar esa estimación como base para calcular un precio máximo recomendable de compra
+            de una unidad siniestrada.
 
-            Desde el punto de vista de negocio, el resultado no debe interpretarse como
-            un precio exacto, sino como una referencia para negociar y reducir el riesgo
-            de sobrepago.
+            Desde el punto de vista de negocio, el resultado no debe interpretarse como un precio exacto,
+            sino como una referencia para negociar y reducir el riesgo de sobrepago.
             """
         )
 
         st.info(
-            "💡 Este modelo no sustituye la experiencia del comprador, pero sirve como "
-            "herramienta de apoyo para tomar decisiones más informadas."
+            "💡 El modelo no sustituye la inspección física ni la experiencia del comprador; "
+            "funciona como herramienta de apoyo para tomar decisiones más informadas."
         )
-
-
-with tab4:
-    st.header("🤖 Asistente IA sobre el cotizador")
-
-    st.markdown(
-        """
-        Puedes preguntar sobre valuaciones, descuentos, márgenes o decisiones de compra.
-        """
-    )
-
-    pregunta = st.text_area("Escribe tu pregunta:", height=150)
-
-    if st.button("Preguntar a ChatGPT"):
-
-        if not os.getenv("OPENAI_API_KEY"):
-            st.error("No se encontró la API key de OpenAI. Define la variable OPENAI_API_KEY.")
-
-        else:
-            try:
-                respuesta = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": (
-                                "Eres un asistente experto en compra-venta de camiones siniestrados "
-                                "y análisis de precios. Responde claro y concreto."
-                            ),
-                        },
-                        {"role": "user", "content": pregunta},
-                    ],
-                    max_tokens=300,
-                    temperature=0.3
-                )
-
-                texto = respuesta.choices[0].message.content
-                st.markdown(texto)
-
-            except Exception as e:
-                st.error(f"Ocurrió un error al llamar la API: {e}")
 
 

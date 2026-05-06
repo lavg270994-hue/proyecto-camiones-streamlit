@@ -59,7 +59,7 @@ st.markdown(
         🚛 Cotizador inteligente de camiones siniestrados
     </h1>
     <p style='text-align: center; color: gray; margin-top: 4px;'>
-        Proyecto final · Ciencia de Datos · Valuación de tractocamiones en el mercado mexicano
+        Proyecto final · Machine Learning · Valuación de tractocamiones en el mercado Mexicano
     </p>
     """,
     unsafe_allow_html=True,

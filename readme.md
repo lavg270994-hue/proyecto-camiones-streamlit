@@ -1,156 +1,173 @@
-📘 Proyecto: Cotizador Inteligente de Camiones Siniestrados
-README – Instrucciones de uso
+# Universidad Anáhuac Puebla
 
-Este proyecto implementa una aplicación web en Streamlit que predice el precio de mercado de un camión de carga en México y genera una cotización ajustada para compra como siniestrado, considerando descuentos, costos y márgenes de venta.
-También incluye un dashboard, análisis del mercado, visualizaciones, importancia de variables y un asistente IA (OpenAI).
+# Proyecto Final  
+## “Cotizador inteligente de camiones siniestrados”
 
-🧠 1. ¿Qué hace la aplicación?
+### Integrantes
+- Edgar Eduardo González Amezcua
+- Luis Alberto Vera Guevara
 
-La aplicación permite:
+### Materia
+Machine Learning
 
-Predecir el precio de mercado de un camión según sus características.
+### Profesor
+Dr. Paulo Daniel Vázquez
 
-Simular escenarios de compra y venta para unidades siniestradas.
+---
 
-Calcular utilidad y margen esperado.
+# Introducción
 
-Ver gráficos del mercado: precios por marca, año y distribución.
+Decidimos desarrollar un cotizador inteligente de camiones siniestrados debido a que uno de los integrantes del equipo, Luis Alberto Vera Guevara, tiene experiencia y un proyecto relacionado con el negocio de reparación de tractocamiones y venta de refacciones.
 
-Consultar la importancia de variables del modelo.
+Dentro de este sector existe una gran oferta de camiones, y el precio puede variar considerablemente dependiendo de múltiples variables como la marca, el motor, la transmisión, el año, la configuración de ejes, la ubicación y el estado general de la unidad.
 
-Usar un asistente IA integrado para responder preguntas sobre el análisis y las cotizaciones.
+Uno de los principales problemas dentro de este negocio es no subestimar los costos de reparación, ya que esto puede reducir significativamente el margen de utilidad esperado. Sin embargo, no todos los tractocamiones tienen el mismo comportamiento en el mercado. Existen marcas como Kenworth que normalmente tienen una rotación de venta más rápida, lo cual puede compensar márgenes menores.
 
-📦 2. Estructura del proyecto
-proyecto-camiones-streamlit/
-│
-├── src/
-│   ├── app.py               ← Aplicación Streamlit principal
-│   ├── train_model.py       ← Script de entrenamiento del modelo
-│   ├── model_camiones.pkl   ← Modelo entrenado
-│   ├── model_metrics.json   ← Métricas principales
-│
-├── data/                    ← Dataset usado (opcional para entrega)
-│
-├── requirements.txt         ← Librerías necesarias para ejecutar la app
-├── README.md                ← Este archivo
+Con este cotizador inteligente, apoyándonos en técnicas de Machine Learning y visualización de datos, es posible estimar el precio de mercado de un tractocamión configurando distintas variables, permitiendo así determinar precios óptimos de compra para unidades siniestradas.
 
-▶️ 3. Cómo ejecutar la aplicación localmente
-Requisitos previos
+---
 
-Asegúrate de tener instalado:
+# Desarrollo
 
-Python 3.10 o superior
+El proyecto fue desarrollado utilizando técnicas de Machine Learning para estimar el valor de mercado de tractocamiones y apoyar la toma de decisiones en la compra de unidades siniestradas.
 
-pip
+Para el proyecto se utilizó un dataset histórico de precios reales proporcionado previamente por el compañero Luis. Adicionalmente, se utilizaron datos sintéticos generados con apoyo de ChatGPT a partir de especificaciones basadas en información histórica real.
 
-Anaconda (opcional pero recomendado)
+El dataset contiene información relacionada con:
 
-Paso 1: Clonar el repositorio
-git clone https://github.com/lavg270994-hue/proyecto-camiones-streamlit.git
-cd proyecto-camiones-streamlit
+- Marca del camión
+- Modelo
+- Año
+- Motor
+- Tipo de transmisión
+- Tipo de eje o diferenciales
+- Ubicación
+- Precio de mercado
 
-Paso 2: Instalar dependencias
-pip install -r requirements.txt
+---
 
-Paso 3: Ejecutar Streamlit
-streamlit run src/app.py
+# Modelos utilizados
 
-Paso 4: Abrir la app en tu navegador
+Inicialmente se implementó un modelo de Random Forest Regressor debido a su capacidad para trabajar con:
 
-Cuando la terminal muestre algo como:
+- Datos heterogéneos
+- Relaciones no lineales
+- Interacciones complejas entre múltiples variables
 
-Local URL: http://localhost:8501
+Posteriormente también se realizó una comparación contra un modelo de Linear Regression para evaluar el desempeño entre distintos enfoques de regresión.
 
+---
 
-Solo debes abrir ese enlace.
+# Métricas de evaluación
 
-🔑 4. Uso del asistente IA (OpenAI)
+Para evaluar el desempeño del modelo se utilizaron las siguientes métricas:
 
-Si deseas usar el asistente IA dentro de la app, debes configurar tu API key:
+## MAE (Mean Absolute Error)
 
-Mac / Linux
-export OPENAI_API_KEY="tu_clave_aqui"
+El Error Absoluto Medio representa el promedio de error entre las predicciones y el valor real.
 
-Windows PowerShell
-setx OPENAI_API_KEY "tu_clave_aqui"
+El modelo obtuvo aproximadamente:
 
+- MAE = $57,397 MXN
 
-Luego reinicia la terminal y vuelve a correr la app.
+Considerando que muchos tractocamiones superan el millón de pesos en valor comercial, este error es aceptable dentro del contexto del proyecto.
 
-🌐 5. Cómo desplegar la app en Streamlit Cloud
+## RMSE (Root Mean Squared Error)
 
-Ve a: https://share.streamlit.io
+La Raíz del Error Cuadrático Medio penaliza errores grandes elevando las diferencias al cuadrado.
 
-Conecta tu cuenta con GitHub.
+El modelo obtuvo:
 
-Selecciona tu repositorio:
+- RMSE = $81,549 MXN
 
-lavg270994-hue/proyecto-camiones-streamlit
+## R² (Coeficiente de determinación)
 
+El coeficiente R² obtenido fue:
 
-En el campo “Main file path”, escribe:
+- R² = 0.81
 
-src/app.py
+Esto indica que el modelo logra explicar aproximadamente el 81% de la variabilidad del precio de mercado.
 
+Durante el desarrollo también se detectó un problema de sobreentrenamiento, ya que inicialmente el modelo mostraba una precisión cercana al 99%, lo cual no era realista. Posteriormente se corrigió mediante una mejor validación utilizando métricas sobre el conjunto de prueba.
 
-Guarda y despliega.
+---
 
-La app se publicará y podrás compartir el enlace.
+# Dashboard y funcionalidades
 
-Si usas el asistente IA, agrega tu API key como Secret:
+El proyecto incluye un dashboard interactivo desarrollado en Streamlit que permite:
 
-En Streamlit Cloud → “App settings”
+- Estimar el precio de mercado de un camión
+- Visualizar diferencias de precio entre marcas
+- Analizar el incremento de precios por año
+- Comparar componentes como motor y transmisión
+- Calcular utilidad esperada
+- Calcular margen estimado
+- Estimar costos totales
+- Simular escenarios de negocio
 
-“Secrets” →
+El sistema predice el precio de mercado de un camión en buen estado, posteriormente aplica un descuento por condición de siniestro y agrega costos relacionados con:
 
-OPENAI_API_KEY="tu_clave"
+- Logística
+- Reparación
+- Otros gastos
 
-📊 6. Métricas del modelo
+Finalmente calcula:
 
-Estas métricas se calculan con datos de prueba reales:
+- Precio sugerido de compra
+- Precio sugerido de venta
+- Utilidad esperada
+- Margen de ganancia
 
-MAE: 57,397
+---
 
-RMSE: 81,549
+# Decisión automática de compra
 
-R²: 0.81
+Se implementó una lógica automática de recomendación para apoyar la toma de decisiones:
 
-El modelo explica el 81% de la variación del precio de mercado.
+- Si el margen es mayor o igual al 20% → **COMPRAR**
+- Si el margen está entre 10% y 20% → **NEGOCIAR**
+- Si el margen es menor al 10% → **NO COMPRAR**
 
-📈 7. Visualizaciones incluidas
+---
 
-La aplicación muestra al menos tres gráficos obligatorios:
+# Conclusión
 
-Histograma de precios.
+El cotizador inteligente permite estimar el valor de mercado de un tractocamión utilizando información histórica y datos reales, facilitando la toma de decisiones y reduciendo el riesgo de pagar un sobreprecio.
 
-Precio promedio por marca.
+La aplicación desarrollada en Streamlit brinda información rápida y profesional, permitiendo calcular utilidad, margen real, costos totales y distintos escenarios de negocio.
 
-Precio promedio por año.
+Además, el dashboard permite visualizar variaciones de precio dependiendo de:
 
-Además incluye:
+- Marca
+- Motor
+- Transmisión
+- Tren motriz
+- Año del camión
 
-Importancia de variables del modelo.
+El proyecto demuestra cómo el Machine Learning puede aplicarse en sectores con alta incertidumbre y múltiples variables que afectan el valor de un bien, buscando disminuir el riesgo y mejorar la precisión en las decisiones de compra.
 
-KPIs de compra, costo total, rentabilidad y margen.
+---
 
-💬 8. Características interactivas
+# Tecnologías utilizadas
 
-Selectores y filtros para configurar el camión.
+- Python
+- Pandas
+- Scikit-learn
+- Streamlit
+- Joblib
+- Altair
+- Machine Learning
+- Random Forest Regressor
+- Linear Regression
 
-Sliders para definir descuento, costos y markup.
+---
 
-Botón de cálculo completo del escenario.
+# Enlaces
 
-Asistente IA integrado.
+## GitHub
+Repositorio del proyecto:
+https://github.com/lavg270994-hue/proyecto-camiones-streamlit
 
-Gráficas dinámicas según las selecciones.
-
-📝 9. Autor
-
-Luis Alberto Vera Castillo
-Proyecto final – Curso de Ciencia de Datos
-2025
-
-✔️ 10. Licencia
-
-Uso académico y no comercial.
+## Streamlit
+Aplicación desplegada:
+https://proyecto-camiones-app-hxvjy7oub58zqmweyyok4m.streamlit.app/
